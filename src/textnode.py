@@ -11,22 +11,14 @@ class TextType(Enum):
 
 
 class TextNode:
-    def __init__(self, text, text_type, url):
+    def __init__(self, text, text_type, url=None):
         super().__init__()
         self.text = text
         self.text_type = TextType(text_type)
         self.url = url
 
     def __eq__(self, other):
-        self_props = sorted(dir(self))
-        other_props = sorted(dir(self))
-        if len(self_props) != len(other_props):
-            return False
-        for i in range(len(self_props)):
-            if self_props[i] != other_props[i]:
-                return False
-
-        return True
+        return self.__dict__ == other.__dict__
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type.value}, {self.url})"
