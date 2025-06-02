@@ -1,36 +1,62 @@
 import unittest
-
 from htmlnode import HTMLNode
 
 
 class TestHTMLNode(unittest.TestCase):
-    def test_props_to_html(self):
-        link_htmlnode = HTMLNode(
-            "a",
-            "This is an Anchor tage",
+    def test_to_html_props(self):
+        node = HTMLNode(
+            "div",
+            "Hello, world!",
             None,
-            {"href": "https://www.google.com", "target": "_blank"},
+            {
+                "class": "greeting",
+                "href": "https://boot.dev",
+                "style": {
+                    "width": "240px",
+                    "height": "120px",
+                    "background-color": "red",
+                },
+            },
         )
-        heading_htmlnode = HTMLNode(
-            "h1", "This is an heading tag", None, {"id": "heading", "class": "heading"}
+        self.assertEqual(
+            node.props_to_html(),
+            ' class="greeting" href="https://boot.dev" style="width: 240px; height: 120px; background-color: red"',
         )
-        div_htmlnode = HTMLNode(
-            "img",
-            "This is HTML div tag",
+
+    def test_values(self):
+        node = HTMLNode(
+            "div",
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.tag,
+            "div",
+        )
+        self.assertEqual(
+            node.value,
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.children,
             None,
-            {"id": "main", "style": {"width": "240px", "height": "120px"}},
+        )
+        self.assertEqual(
+            node.props,
+            None,
         )
 
+    def test_repr(self):
+        node = HTMLNode(
+            "p",
+            "What a strange world",
+            None,
+            {"class": "primary"},
+        )
         self.assertEqual(
-            link_htmlnode.props_to_html(),
-            'href="https://www.google.com" target="_blank"',
+            node.__repr__(),
+            "HTMLNode(p, What a strange world, children: None, {'class': 'primary'})",
         )
 
-        self.assertEqual(
-            heading_htmlnode.props_to_html(), 'id="heading" class="heading"'
-        )
 
-        self.assertEqual(
-            div_htmlnode.props_to_html(),
-            'id="main" style="width: 240px; height: 120px"',
-        )
+if __name__ == "__main__":
+    unittest.main()
