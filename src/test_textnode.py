@@ -1,7 +1,6 @@
 import unittest
 
-from textnode import TextNode, TextType
-from textnode_utils import text_node_to_html_node, split_nodes_delimiter
+from textnode import TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -54,50 +53,6 @@ class TestTextNodeToHTMLNode(unittest.TestCase):
         html_node = text_node_to_html_node(node)
         self.assertEqual(html_node.tag, "b")
         self.assertEqual(html_node.value, "This is bold")
-
-
-class TestSplitNodesDelimiter(unittest.TestCase):
-    def test_bold_text(self):
-        node = TextNode("This is a **bolded text** in the middle.", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-        self.assertEqual(len(new_nodes), 3)
-        self.assertEqual(new_nodes[1].text_type, TextType.BOLD)
-        self.assertEqual(new_nodes[1].text, "bolded text")
-
-    def test_italic_text(self):
-        node = TextNode("This is an _italic text_ in the middle.", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "_", TextType.ITALIC)
-        self.assertEqual(len(new_nodes), 3)
-        self.assertEqual(new_nodes[1].text_type, TextType.ITALIC)
-        self.assertEqual(new_nodes[1].text, "italic text")
-
-    def test_code_text(self):
-        node = TextNode("This is an `sample code` in the middle.", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(new_nodes), 3)
-        self.assertEqual(new_nodes[1].text_type, TextType.CODE)
-        self.assertEqual(new_nodes[1].text, "sample code")
-
-    def test_one_word(self):
-        node = TextNode("**bold**", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-        self.assertEqual(len(new_nodes), 1)
-        self.assertEqual(new_nodes[0].text_type, TextType.BOLD)
-        self.assertEqual(new_nodes[0].text, "bold")
-
-    def test_markdown_at_start(self):
-        node = TextNode("**bolded text** at the start.", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-        self.assertEqual(len(new_nodes), 2)
-        self.assertEqual(new_nodes[0].text_type, TextType.BOLD)
-        self.assertEqual(new_nodes[0].text, "bolded text")
-        self.assertEqual(new_nodes[1].text, " at the start.")
-
-    def test_markdown_at_end(self):
-        node = TextNode("At the end: `code`", TextType.TEXT)
-        new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
-        self.assertEqual(len(new_nodes), 2)
-        self.assertEqual(new_nodes[1].text_type, TextType.CODE)
 
 
 if __name__ == "__main__":
