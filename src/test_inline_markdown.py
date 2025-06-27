@@ -1,6 +1,8 @@
 import unittest
 from inline_markdown import (
     split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links,
 )
 
 from textnode import TextNode, TextType
@@ -85,6 +87,58 @@ class TestInlineMarkdown(unittest.TestCase):
             ],
             new_nodes,
         )
+
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_multiple_images(self):
+        matches = extract_markdown_images(
+            "This is text with mutiple ![image](https://i.imgur.com/zjjcJKZ.png), ![image2](https://imgur.com/gallery/i-wanted-to-show-yall-zucchini-2nwPDB2)"
+        )
+        self.assertListEqual(
+            [
+                ("image", "https://i.imgur.com/zjjcJKZ.png"),
+                (
+                    "image2",
+                    "https://imgur.com/gallery/i-wanted-to-show-yall-zucchini-2nwPDB2",
+                ),
+            ],
+            matches,
+        )
+
+    def test_extract_markdown_images_broken(self):
+        matches = extract_markdown_images(
+            "This is text with an [image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([], matches)
+
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is a text with a [link](https://www.google.com)"
+        )
+        self.assertListEqual([("link", "https://www.google.com")], matches)
+
+    def test_extract_markdown_multiple_links(self):
+        matches = extract_markdown_links(
+            "This is a text with multiple [google](https://www.google.com), [facebook](https://www.facebook.com), and [youtube](https://www.youtube.com)"
+        )
+        self.assertListEqual(
+            [
+                ("google", "https://www.google.com"),
+                ("facebook", "https://www.facebook.com"),
+                ("youtube", "https://www.youtube.com"),
+            ],
+            matches,
+        )
+
+    def test_extract_markdown_links_broken(self):
+        matches = extract_markdown_links(
+            "This is a text with a link](https://www.google.com)"
+        )
+        self.assertListEqual([], matches)
 
 
 if __name__ == "__main__":
