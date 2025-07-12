@@ -3,6 +3,16 @@ import re
 from textnode import TextNode, TextType
 
 
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "_", TextType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_link(nodes)
+    return nodes
+
+
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
@@ -76,17 +86,6 @@ def split_nodes_link(old_nodes):
         if original_text != "":
             new_nodes.append(TextNode(original_text, TextType.TEXT))
     return new_nodes
-
-
-def text_to_textnodes(text):
-    node = TextNode(text, TextType.TEXT)
-    bold_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
-    italic_nodes = split_nodes_delimiter(bold_nodes, "_", TextType.ITALIC)
-    code_nodes = split_nodes_delimiter(italic_nodes, "`", TextType.CODE)
-    image_nodes = split_nodes_image(code_nodes)
-    link_nodes = split_nodes_link(image_nodes)
-
-    return link_nodes
 
 
 def extract_markdown_images(text):

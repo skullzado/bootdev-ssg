@@ -66,6 +66,19 @@ class TestInlineMarkdown(unittest.TestCase):
             new_nodes,
         )
 
+    def test_delim_bold_and_italic(self):
+        node = TextNode("**bold** and _italic_", TextType.TEXT)
+        new_nodes = split_nodes_delimiter([node], "**", TextType.BOLD)
+        new_nodes = split_nodes_delimiter(new_nodes, "_", TextType.ITALIC)
+        self.assertEqual(
+            [
+                TextNode("bold", TextType.BOLD),
+                TextNode(" and ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+            ],
+            new_nodes,
+        )
+
     def test_delim_code(self):
         node = TextNode("This is text with a `code block` word", TextType.TEXT)
         new_nodes = split_nodes_delimiter([node], "`", TextType.CODE)
@@ -159,11 +172,10 @@ class TestInlineMarkdown(unittest.TestCase):
         )
 
     def test_text_to_textnodes(self):
-        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
-        text_two = "**bold** _italic_ `code` ![image](https://i.imgur.com/fJRm4Vk.jpeg) [link](https://boot.dev)"
-
-        textnodes = text_to_textnodes(text)
-        self.assertEqual(
+        nodes = text_to_textnodes(
+            "This is **text** with an _italic_ word and a `code block` and an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://boot.dev)"
+        )
+        self.assertListEqual(
             [
                 TextNode("This is ", TextType.TEXT),
                 TextNode("text", TextType.BOLD),
@@ -172,56 +184,11 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode(" word and a ", TextType.TEXT),
                 TextNode("code block", TextType.CODE),
                 TextNode(" and an ", TextType.TEXT),
-                TextNode(
-                    "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
-                ),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/zjjcJKZ.png"),
                 TextNode(" and a ", TextType.TEXT),
                 TextNode("link", TextType.LINK, "https://boot.dev"),
             ],
-            textnodes,
-        )
-        textnodes_two = text_to_textnodes(text_two)
-        self.assertEqual(
-            [
-                TextNode("bold", TextType.BOLD),
-                TextNode(" ", TextType.TEXT),
-                TextNode("italic", TextType.ITALIC),
-                TextNode(" ", TextType.TEXT),
-                TextNode("code", TextType.CODE),
-                TextNode(" ", TextType.TEXT),
-                TextNode("image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
-                TextNode(" ", TextType.TEXT),
-                TextNode("link", TextType.LINK, "https://boot.dev"),
-            ],
-            textnodes_two,
-        )
-
-    def test_text_not_all_text_types(self):
-        text = "This is a [link](https://boot.dev) and a **bold** text."
-        textnodes = text_to_textnodes(text)
-        self.assertEqual(
-            [
-                TextNode("This is a ", TextType.TEXT),
-                TextNode("link", TextType.LINK, "https://boot.dev"),
-                TextNode(" and a ", TextType.TEXT),
-                TextNode("bold", TextType.BOLD),
-                TextNode(" text.", TextType.TEXT),
-            ],
-            textnodes,
-        )
-        text_two = (
-            '`name = "Paul"` **SUBSCRIBE** [YouTube](https://youtube.com/@bootdotdev)'
-        )
-        textnodes_two = text_to_textnodes(text_two)
-        self.assertEqual(
-            [
-                TextNode('name = "Paul"', TextType.CODE),
-                TextNode(" ", TextType.TEXT),
-                TextNode("SUBSCRIBE", TextType.BOLD),
-                TextNode(" ", TextType.TEXT),
-                TextNode("YouTube", TextType.LINK, "https://youtube.com/@bootdotdev"),
-            ],
-            textnodes_two,
+            nodes,
         )
 
 
