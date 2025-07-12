@@ -3,6 +3,7 @@ from inline_markdown import (
     split_nodes_delimiter,
     split_nodes_image,
     split_nodes_link,
+    text_to_textnodes,
     extract_markdown_links,
     extract_markdown_images,
 )
@@ -155,6 +156,72 @@ class TestInlineMarkdown(unittest.TestCase):
                 TextNode(" with text that follows", TextType.TEXT),
             ],
             new_nodes,
+        )
+
+    def test_text_to_textnodes(self):
+        text = "This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        text_two = "**bold** _italic_ `code` ![image](https://i.imgur.com/fJRm4Vk.jpeg) [link](https://boot.dev)"
+
+        textnodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is ", TextType.TEXT),
+                TextNode("text", TextType.BOLD),
+                TextNode(" with an ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" word and a ", TextType.TEXT),
+                TextNode("code block", TextType.CODE),
+                TextNode(" and an ", TextType.TEXT),
+                TextNode(
+                    "obi wan image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"
+                ),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            textnodes,
+        )
+        textnodes_two = text_to_textnodes(text_two)
+        self.assertEqual(
+            [
+                TextNode("bold", TextType.BOLD),
+                TextNode(" ", TextType.TEXT),
+                TextNode("italic", TextType.ITALIC),
+                TextNode(" ", TextType.TEXT),
+                TextNode("code", TextType.CODE),
+                TextNode(" ", TextType.TEXT),
+                TextNode("image", TextType.IMAGE, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                TextNode(" ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+            ],
+            textnodes_two,
+        )
+
+    def test_text_not_all_text_types(self):
+        text = "This is a [link](https://boot.dev) and a **bold** text."
+        textnodes = text_to_textnodes(text)
+        self.assertEqual(
+            [
+                TextNode("This is a ", TextType.TEXT),
+                TextNode("link", TextType.LINK, "https://boot.dev"),
+                TextNode(" and a ", TextType.TEXT),
+                TextNode("bold", TextType.BOLD),
+                TextNode(" text.", TextType.TEXT),
+            ],
+            textnodes,
+        )
+        text_two = (
+            '`name = "Paul"` **SUBSCRIBE** [YouTube](https://youtube.com/@bootdotdev)'
+        )
+        textnodes_two = text_to_textnodes(text_two)
+        self.assertEqual(
+            [
+                TextNode('name = "Paul"', TextType.CODE),
+                TextNode(" ", TextType.TEXT),
+                TextNode("SUBSCRIBE", TextType.BOLD),
+                TextNode(" ", TextType.TEXT),
+                TextNode("YouTube", TextType.LINK, "https://youtube.com/@bootdotdev"),
+            ],
+            textnodes_two,
         )
 
 
