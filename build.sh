@@ -1,1 +1,1 @@
-python3 src/main.py "github.com/skullzado/bootdev-ssg"
+python3 src/main.py "github.com/skullzado/bootdev-ssg/"
